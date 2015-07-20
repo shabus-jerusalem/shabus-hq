@@ -1,3 +1,5 @@
 flask
 flask-heroku
 gunicorn
+SQLAlchemy
+Flask-SQLAlchemy

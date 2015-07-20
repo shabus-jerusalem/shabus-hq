@@ -9,11 +9,25 @@ This file creates your application.
 import os
 from flask import Flask, render_template, request, redirect, url_for
 from flask.ext.heroku import Heroku
+from flask.ext.sqlalchemy import SQLAlchemy
 
 app = Flask(__name__)
 heroku = Heroku(app)
+db = SQLAlchemy(app)
 
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'this_should_be_configured')
+
+class User(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(80))
+    email = db.Column(db.String(254), unique=True)
+
+    def __init__(self, name, email):
+        self.name = name
+        self.email = email
+
+    def __repr__(self):
+        return '<Name %r>' % self.name
 
 
 ###
