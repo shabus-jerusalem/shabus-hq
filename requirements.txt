@@ -3,3 +3,4 @@ flask-heroku
 gunicorn
 SQLAlchemy
 Flask-SQLAlchemy
+psycopg2
