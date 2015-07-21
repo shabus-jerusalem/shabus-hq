@@ -4,3 +4,5 @@ gunicorn
 SQLAlchemy
 Flask-SQLAlchemy
 psycopg2
+Flask-Login
+Flask-OpenID
