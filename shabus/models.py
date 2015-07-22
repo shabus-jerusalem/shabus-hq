@@ -24,13 +24,13 @@ class User(db.Model, UserMixin):
 class Member(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     main_passenger_id = db.Column(db.Integer, db.ForeignKey("passenger.id"), unique=True)
-    main_passenger = db.relationship("Passenger")
-    created = db.Column(db.Timestsamp)
+    main_passenger = db.relationship("Passenger", foreign_keys=[main_passenger_id])
+    created = db.Column(db.DateTime)
 
 class Passenger(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     member_id = db.Column(db.Integer, db.ForeignKey("member.id"))
-    category = db.relationship("Category", backref="passengers"))
+    member = db.relationship("Member", backref="passengers", foreign_keys=[member_id])
 
     first_name = db.Column(db.String(255))
     last_name = db.Column(db.String(255))
@@ -38,4 +38,4 @@ class Passenger(db.Model):
 class Ride(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     passenger_id = db.Column(db.Integer, db.ForeignKey("passenger.id"))
-    start_time = db.Column(db.Timestsamp)
+    start_time = db.Column(db.DateTime)
