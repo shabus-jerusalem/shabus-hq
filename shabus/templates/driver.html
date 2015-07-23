@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html ng-app="shabusApp">
+<head lang="en">
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Test</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
+    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.3/angular.min.js"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename='js/app.js') }}"></script>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/driver.css') }}" >
+
+</head>
+<body ng-controller="loginController">
+<div class="container">
+    <img class="img-responsive" src="{{ url_for('static', filename='logo_header.svg') }}">
+    <div id="login" ng-hide="loggedIn">
+        <form ng-submit="login()">
+            <div class="form-group" ng-class="{ 'has-error' : error_message != null }" >
+                <input type="text" id="user" class="form-control" ng-model="user" placeholder="Username" />
+                <input type="text" id="password" class="form-control" ng-model="password" placeholder="Password" />
+                <span id="helpBlock" class="help-block"  ng-hide="error_message == null">
+                    {% raw %}{{ error_message }} {% endraw %}
+                </span>
+                <input class="btn btn-default" type="submit" value="Login"/>
+            </div>
+        </form>
+    </div>
+    <div id="interface" ng-show="loggedIn" ng-controller="userController">
+        <form ng-submit="validate()">
+            <div class="form-group" ng-class="{ 'has-success' : approved, 'has-error' : (checked && !approved)}">
+                <input class="form-control" type="text"   ng-focus="checked = false" ng-model="credentials" placeholder="Identification" />
+                <span id="helpBlock" class="help-block"  ng-show="checked">
+                    {% raw %}{{ text }} {% endraw %}
+                </span>
+            </div>
+            <input class="btn btn-default"  type="submit" value="Submit"/>
+        </form>
+            
+        <button class="btn btn-default" ng-click="logout()">Logout</button>
+    </div>
+</div>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
+</body>
+</html>
