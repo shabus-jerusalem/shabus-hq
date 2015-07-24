@@ -4,7 +4,6 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <base href="/">
     <title>Test</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.min.css') }}">
     <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.3/angular.min.js"></script>
@@ -20,13 +19,18 @@
     <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
         <ul class="nav navbar-nav navbar-left">
             <li><a href="/logout">התנתק</a></li>
+            <li><button type="button" class="btn btn-danger" aria-label="Left Align" ng-class="{'btn-success' : 
+            hasPosition}">
+                <span class="glyphicon glyphicon-record" aria-hidden="true"></span>
+                מיקום
+            </button></li>
         </ul>
     </div>
 </nav>
 <div class="container-fluid" >
     <div id="interface" ng-hide="checked">
         <img class="img-responsive" src="{{ url_for('static', filename='logo_header.svg') }}">
-        <form ng-submit="validate()">
+        <form ng-submit="approve()">
             <input class="form-control input-lg" type="text" ng-model="credentials" placeholder="פרט מזהה" />
             <input class="btn btn-success btn-block btn-lg"  type="submit" value="!בדוק נוסע/ת"/>
         </form>
