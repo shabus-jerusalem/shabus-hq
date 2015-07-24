@@ -19,7 +19,9 @@ angular.module('shabusApp', [])
 
 
         $window.navigator.geolocation.watchPosition(function(current_position){
-            $scope.hasPosition = true;
+            $scope.$apply(function(){
+                $scope.hasPosition = true;
+            });
             position = {
                     "accuracy" : current_position["coords"].accuracy,
                     "latitude" : current_position["coords"].latitude,
@@ -27,7 +29,9 @@ angular.module('shabusApp', [])
                     "speed" : current_position["coords"].speed
                 };
         }, function(err){
-            $scope.hasPosition = false;
+            $scope.$apply(function(){
+                $scope.hasPosition = false;
+            });
             position = {
                 "accuracy" : null,
                 "latitude" : null,

@@ -15,13 +15,6 @@ body {
     background-color: #DFF0D8;
 }
 
-.navbar-nav > li > a, .navbar-brand {
-    padding-top:4px !important; 
-    padding-bottom:0 !important;
-    height: 28px;
-}
-
-.navbar {min-height:28px !important;}
 
 .img-responsive {
     margin: 0 auto;

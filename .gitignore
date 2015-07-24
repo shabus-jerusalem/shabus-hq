@@ -36,3 +36,4 @@ pip-log.txt
 # Code
 shabus/hopon.py
 
+*.swp

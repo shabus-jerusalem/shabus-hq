@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Test</title>
+    <title>שבוס נהגים</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.min.css') }}">
     <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.3/angular.min.js"></script>
     <script type="text/javascript" src="{{ url_for('static', filename='js/app.js') }}"></script>
@@ -14,16 +14,17 @@
 <body dir="rtl" ng-controller="userController" ng-click="checked = false" ng-class="{'bg-success' : checked && approved, 'bg-danger' : checked && !approved }" >
 <nav class="navbar navbar-inverse">
     <div class="navbar-header navbar-right">
+        <button type="button" class="disabled btn btn-danger navbar-btn" aria-label="Left Align" ng-class="{'btn-success' : 
+            hasPosition}">
+            <span class="glyphicon glyphicon-record" aria-hidden="true"></span>
+            מיקום
+        </button>
+        <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#menu" aria-expanded="false"><span class="icon-bar"></span><span class="icon-bar"></span><span class="icon-bar"></span></button>
         <a class="navbar-brand" href="#">שבוס</a>
     </div>
-    <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+    <div class="collapse navbar-collapse" id="menu">
         <ul class="nav navbar-nav navbar-left">
             <li><a href="/logout">התנתק</a></li>
-            <li><button type="button" class="btn btn-danger" aria-label="Left Align" ng-class="{'btn-success' : 
-            hasPosition}">
-                <span class="glyphicon glyphicon-record" aria-hidden="true"></span>
-                מיקום
-            </button></li>
         </ul>
     </div>
 </nav>
@@ -32,7 +33,7 @@
         <img class="img-responsive" src="{{ url_for('static', filename='logo_header.svg') }}">
         <form ng-submit="approve()">
             <input class="form-control input-lg" type="text" ng-model="credentials" placeholder="פרט מזהה" />
-            <input class="btn btn-success btn-block btn-lg"  type="submit" value="!בדוק נוסע/ת"/>
+            <input class="btn btn-success btn-block btn-lg"  type="submit" value="בדוק נוסע/ת!"/>
         </form>
     </div>
     <div id="result" ng-show="checked">
