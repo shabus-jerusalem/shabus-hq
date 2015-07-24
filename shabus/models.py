@@ -57,8 +57,8 @@ class Passenger(db.Model):
     passenger_type = db.Column(db.Enum("member", "spouse", "child", name="passenger_types"))
     first_name = db.Column(db.String(255))
     last_name = db.Column(db.String(255))
-    phone_number = db.Column(db.String(255))
-    id_number = db.Column(db.String(255))
+    phone_number = db.Column(db.String(255), unique=True)
+    id_number = db.Column(db.String(255), unique=True)
     has_smartphone = db.Column(db.Boolean())
 
 class Ride(db.Model):
