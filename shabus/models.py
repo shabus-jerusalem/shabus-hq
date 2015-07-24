@@ -2,7 +2,7 @@ from shabus import db
 from flask.ext.security import UserMixin, RoleMixin
 
 roles_users = db.Table("roles_users",
-        db.Column("user_id", db.Integer(), db.ForeignKey("user.id")),
+        db.Column("user_id", db.Integer(), db.ForeignKey("user_.id")),
         db.Column("role_id", db.Integer(), db.ForeignKey("role.id")))
 
 class Role(db.Model, RoleMixin):
@@ -11,6 +11,7 @@ class Role(db.Model, RoleMixin):
     description = db.Column(db.String(255))
 
 class User(db.Model, UserMixin):
+    __tablename__ = "user_"
     id = db.Column(db.Integer, primary_key=True)
     email = db.Column(db.String(254), unique=True)
     password = db.Column(db.String(255))
@@ -65,7 +66,7 @@ class Ride(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     passenger_id = db.Column(db.Integer, db.ForeignKey("passenger.id"))
     board_time = db.Column(db.DateTime)
-    recorded_by_user_id = db.Column(db.Integer, db.ForeignKey("user.id"))
+    recorded_by_user_id = db.Column(db.Integer, db.ForeignKey("user_.id"))
     recorded_by_user = db.relationship("User", foreign_keys=[recorded_by_user_id])
     board_location = db.Column(db.String(255))
 

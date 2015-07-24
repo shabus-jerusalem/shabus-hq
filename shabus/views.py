@@ -1,6 +1,9 @@
-from flask import render_template, jsonify
-from shabus import app
+# -*- coding: utf8 -*-
+from flask import render_template, jsonify, request
+from shabus import app, models
 from flask.ext.security import login_required
+from sqlalchemy import or_
+from sqlalchemy.orm.exc import NoResultFound, MultipleResultsFound
 
 @app.route('/')
 @login_required
@@ -18,8 +21,19 @@ def page_not_found(error):
 def driver():
     return render_template('driver.html')
 
-@app.route('/driver/validate', methods=['POST'])
+@app.route('/driver/approve', methods=['POST'])
 @login_required
-def validate():
-	# TODO: return approved false when needed
-    return jsonify(status="OK", data=[{"text" : "User TEST was approved", "approved" : True}])
+def approve_ride():
+    # TODO: return approved false when needed
+    credentials = request.data
+    query = models.Passenger.query.filter(or_(models.Passenger.phone_number==credentials,
+                                                 models.Passenger.id_number==credentials))
+    try:
+    	passanger = query.one()
+    	return jsonify(status="OK", data={"text" : "הנוסע/ת בשם {0} {1} מאושר. נסיעה טובה!".format(passanger.first_name, passanger.last_name), 
+    									   "approved" : True})
+    except sqlalchemy.orm.exc.NoResultFound:
+    	return jsonify(status="ERROR", data={"text" : "לא זיהינו את הנוסע/ת {0}".format(credentials), "approved" : False})
+    except sqlalchemy.orm.exc.MultipleResultsFound:
+    	return jsonify(status="ERROR", data={"text" : "תקלה: ניתן לזהות יותר מנוסע אחד לפי {0}".format(credentials), "approved" : False})
+    

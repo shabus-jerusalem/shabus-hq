@@ -1,3 +1,30 @@
+html,body
+{
+    height:100%;
+}
+
 body {
     background-color: #93bb00;
+}
+
+.navbar-nav > li > a, .navbar-brand {
+    padding-top:4px !important; 
+    padding-bottom:0 !important;
+    height: 28px;
+}
+
+.navbar {min-height:28px !important;}
+
+.img-responsive {
+    margin: 0 auto;
+    width: 40em;
+}
+
+#result{
+	color:#ffffff;
+	padding-top: 10em;
+}
+
+#result h1{
+	text-shadow: 0px 1px 1px #555;
 }
