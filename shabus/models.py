@@ -41,6 +41,7 @@ class Member(db.Model):
     legal_statement = db.Column(db.Text())
     signature_image_url = db.Column(db.String(255))
     backed_on_headstart = db.Column(db.Boolean())
+    used_old_form_to_sign_up = db.Column(db.Boolean())
     credit_card_payment_products = db.Column(db.String(255))
     credit_card_payer_info = db.Column(db.String(255))
     credit_card_payer_address = db.Column(db.String(255))
