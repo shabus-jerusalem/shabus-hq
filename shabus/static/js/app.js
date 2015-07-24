@@ -1,36 +1,5 @@
 angular.module('shabusApp', [])
 
-    .controller('loginController', ['$scope', '$http', function($scope, $http) {
-        $scope.user = "";
-        $scope.password = "";
-        $scope.error_message = null;
-        $scope.loggedIn = false
-
-        $scope.login = function(){
-            $http.post('/driver/login', [this.user, this.password])
-            .success(function(data, status, headers, config){
-                $scope.loggedIn = true;
-            })
-            .error(function(data, status, headers, config){
-                console.log($scope.user);
-                console.log($scope.password);
-            });
-        };
-
-        $scope.logout = function(err){
-            $scope.error_message = err;
-            console.log("Logout1");
-            $http.post('/driver/logout')
-            .success(function(data, status, headers, config){
-                $scope.loggedIn = false;
-            })
-            .error(function(data, status, headers, config){
-                console.log($scope.user);
-                console.log($scope.password);
-            });
-        }
-    }])
-
     .controller('userController', ['$scope', '$http', function($scope, $http) {
         $scope.credentials = "";
         $scope.checked = false;
