@@ -67,6 +67,7 @@ class Ride(db.Model):
     board_time = db.Column(db.DateTime)
     recorded_by_user_id = db.Column(db.Integer, db.ForeignKey("user.id"))
     recorded_by_user = db.relationship("User", foreign_keys=[recorded_by_user_id])
+    board_location = db.Column(db.String(255))
 
 class Address(db.Model):
     id = db.Column(db.Integer, primary_key=True)
