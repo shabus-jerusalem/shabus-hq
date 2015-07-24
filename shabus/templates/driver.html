@@ -32,7 +32,7 @@
     <div id="interface" ng-hide="checked">
         <img class="img-responsive" src="{{ url_for('static', filename='logo_header.svg') }}">
         <form ng-submit="approve()">
-            <input class="form-control input-lg" type="text" ng-model="credentials" placeholder="פרט מזהה" />
+            <input class="form-control input-lg" type="text" pattern="[0-9]*" ng-model="credentials" placeholder="פרט מזהה" />
             <input class="btn btn-success btn-block btn-lg"  type="submit" value="בדוק נוסע/ת!"/>
         </form>
     </div>

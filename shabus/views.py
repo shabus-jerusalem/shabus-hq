@@ -26,8 +26,9 @@ def driver():
 @app.route('/driver/approve', methods=['POST'])
 @login_required
 def approve_ride():
-    # TODO: return approved false when needed
+    # TODO: accept only unicode
     data = json.loads(request.data)
+    print repr(data["id"])
     credentials = data["id"]
     position = data["position"]
     query = models.Passenger.query.filter(or_(models.Passenger.phone_number==credentials,
@@ -42,10 +43,10 @@ def approve_ride():
         )
         db.session.add(ride)
         db.session.commit()
-        return jsonify(status="OK", data={"text" : "הנוסע/ת בשם {0} {1} מאושר. נסיעה טובה!".format(passanger.first_name, passanger.last_name), 
+        return jsonify(status="OK", data={"text" : u"הנוסע/ת בשם {0} {1} מאושר. נסיעה טובה!".format(passanger.first_name, passanger.last_name), 
                                            "approved" : True})
     except NoResultFound:
-        return jsonify(status="ERROR", data={"text" : "לא זיהינו את הנוסע/ת {0}".format(credentials), "approved" : False})
+        return jsonify(status="ERROR", data={"text" : u"לא זיהינו את הנוסע/ת {0}".format(credentials), "approved" : False})
     except MultipleResultsFound:
-        return jsonify(status="ERROR", data={"text" : "תקלה: ניתן לזהות יותר מנוסע אחד לפי {0}".format(credentials), "approved" : False})
+        return jsonify(status="ERROR", data={"text" : u"תקלה: ניתן לזהות יותר מנוסע אחד לפי {0}".format(credentials), "approved" : False})
     
