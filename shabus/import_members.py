@@ -44,9 +44,75 @@ def process_row(member_row):
     for bool_attribute in bool_attributes:
         save_bool(member_dict, member, bool_attribute)
     save_datetime(member_dict, member, "submission_date")
-    db.session.add()
+    db.session.add(member)
+
+    add_passengers(member_dict, member)
 
     return member, recommending_member_phone_number
+
+def add_passengers(member_dict, member):
+    main_passenger = get_main_passenger(member_dict, member)
+    family_passengers = get_family_passengers(member_dict, member, main_passenger)
+
+    for passenger in [main_passenger] + family_passengers:
+        db.session.add(passenger)
+
+def get_main_passenger(member_dict, member):
+    main_passenger = db.Passenger()
+    main_passenger.member = member
+    main_passenger_attributes = ("last_name", "first_name", "phone_number", "id_number")
+    for passenger_attribute in main_passenger_attributes:
+        save_string(member_dict, passenger, passenger_attribute)
+    save_bool(member_dict, passenger, "has_smartphone")
+    main_passenger.passenger_type = "member"
+    return main_passenger
+
+def get_family_passengers(member_dict, member, main_passenger):
+    if not is_true(member_dict["has_family"])
+        return []
+
+    family_passengers = []
+    if has_value(member_dict["spouse_phone_number"]):
+        family_passengers.append(get_spouse_passenger(member_dict, member))
+
+    if has_value(member_dict["children_phone_numbers"]):
+        family_passengers += list(get_child_passengers(member_dict, member))
+
+    family_members_have_smartphone = is_true(member_dict["family_members_have_smartphone"])
+    if not family_members_have_smartphone:
+        update_family_member_details(member_dict, family_passengers, main_passenger)
+
+    for family_passenger in family_passengers:
+        family_passenger.has_smartphone = family_members_have_smartphone
+
+    return family_passengers
+
+def get_spouse_passenger(member_dict, member):
+    spouse_passenger = db.Passenger()
+    spouse_passenger.member = member
+    spouse_passenger.type = "spouse"
+    spouse_passenger.phone_number = member_dict["spouse_phone_number"]
+    return spouse_passenger
+
+def get_child_passengers(member_dict, member):
+    children_phone_numbers = member_dict["children_phone_numbers"].split("\n")
+    for child_phone_number in children_phone_numbers:
+        child_passenger = db.Passenger()
+        child_passenger.member = member
+        child_passenger.type = "child"
+        child_passenger.phone_number = child_phone_number
+        yield child_passenger
+
+def update_family_member_details(member_dict, family_passengers, main_passenger):
+    family_member_names = member_dict["family_member_names"].split("\n")
+    family_member_id_numbers = member_dict["family_member_id_numbers"].split("\n")
+    assert len(family_member_names) == len(family_passengers)
+    assert len(family_member_id_numbers) == len(family_passengers)
+    for family_passenger, family_member_name, family_member_id_number in \
+        zip(family_passengers, family_member_names, family_member_id_numbers):
+        family_passenger.first_name = family_member_name
+        family_passenger.last_name = main_passenger.last_name
+        family_passenger.id_number = family_member_id_number
 
 def get_csv_columns():
     return (
