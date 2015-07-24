@@ -11,7 +11,7 @@
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/driver.css') }}" >
 
 </head>
-<body dir="rtl" ng-controller="userController" ng-click="checked = false" ng-class="{'bg-success' : checked && approved, 'bg-danger' : checked && !approved }" >
+<body dir="rtl" ng-controller="userController" ng-click="reset()" ng-class="{'bg-success' : checked && approved, 'bg-danger' : checked && !approved }" >
 <nav class="navbar navbar-inverse">
     <div class="navbar-header navbar-right">
         <button type="button" class="disabled btn btn-danger navbar-btn" aria-label="Left Align" ng-class="{'btn-success' : 

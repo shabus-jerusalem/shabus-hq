@@ -45,6 +45,7 @@ angular.module('shabusApp', [])
             console.log(position);
             $http.post('/driver/approve', {"id" : $scope.credentials, "position" : position})
             .success(function(data, status, headers, config){
+                $scope.credentials = "";
                 $scope.counter = 5;
                 interval = $interval($scope.countdown, 1000);
 
@@ -53,6 +54,7 @@ angular.module('shabusApp', [])
                 $scope.text = data["data"]["text"]            
             })
             .error(function(data, status, headers, config){
+                $scope.credentials = "";
                 // Logout in case user isn't logged in
                 if (status >= 400 && status < 500){
                     $window.location.href = '/login';
@@ -67,6 +69,12 @@ angular.module('shabusApp', [])
                 $scope.checked = false;
                 $interval.cancel(interval);
             }
+        }
+
+        $scope.reset = function(){
+            $scope.checked = false; 
+            $scope.counter=0;
+            $interval.cancel(interval);
         }
 
     }]);
