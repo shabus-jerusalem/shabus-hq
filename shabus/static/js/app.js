@@ -1,23 +1,80 @@
 angular.module('shabusApp', [])
 
-    .controller('userController', ['$scope', '$http', function($scope, $http) {
+    .controller('userController', ['$scope', '$http', '$interval', '$window',
+                function($scope, $http, $interval, $window) {
         $scope.credentials = "";
         $scope.checked = false;
         $scope.approved = false;
-        $scope.text = "No user is approved";
+        $scope.text = "";
+        $scope.counter = 0;
+        $scope.hasPosition = false;
 
-        $scope.validate = function() {
-            console.log("hi");
-            $http.post('/driver/validate', $scope.credentials)
+        var position = {
+            "accuracy" : null,
+            "latitude" : null,
+            "longitude" : null,
+            "speed" : null
+        };
+        var interval = null;
+
+
+        $window.navigator.geolocation.watchPosition(function(current_position){
+            $scope.$apply(function(){
+                $scope.hasPosition = true;
+            });
+            position = {
+                    "accuracy" : current_position["coords"].accuracy,
+                    "latitude" : current_position["coords"].latitude,
+                    "longitude" : current_position["coords"].longitude,
+                    "speed" : current_position["coords"].speed
+                };
+        }, function(err){
+            $scope.$apply(function(){
+                $scope.hasPosition = false;
+            });
+            position = {
+                "accuracy" : null,
+                "latitude" : null,
+                "longitude" : null,
+                "speed" : null
+            };
+        },
+        { "maximumAge" : 30000, "timeout" : 1000 });
+
+        $scope.approve = function() {
+            console.log(position);
+            $http.post('/driver/approve', {"id" : $scope.credentials, "position" : position})
             .success(function(data, status, headers, config){
+                $scope.credentials = "";
+                $scope.counter = 5;
+                interval = $interval($scope.countdown, 1000);
+
                 $scope.checked = true;
-                $scope.approved = data["approved"];
-                $scope.text = data["text"]
+                $scope.approved = data["status"] == "OK";
+                $scope.text = data["data"]["text"]            
             })
             .error(function(data, status, headers, config){
-                $scope.checked = false;
-                $scope.logout("Not logged In")
+                $scope.credentials = "";
+                // Logout in case user isn't logged in
+                if (status >= 400 && status < 500){
+                    $window.location.href = '/login';
+                }
             });
         };
+
+
+        $scope.countdown = function(){
+            $scope.counter--;
+            if ($scope.counter <= 0){
+                $scope.checked = false;
+                $interval.cancel(interval);
+            }
+        }
+
+        $scope.reset = function(){
+            $scope.checked = false; 
+            $scope.counter=0;
+            $interval.cancel(interval);
+        }
 
     }]);

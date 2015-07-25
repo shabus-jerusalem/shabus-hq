@@ -4,28 +4,46 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Test</title>
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
+    <title>שבוס נהגים</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.min.css') }}">
     <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.3/angular.min.js"></script>
     <script type="text/javascript" src="{{ url_for('static', filename='js/app.js') }}"></script>
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/driver.css') }}" >
 
 </head>
-<body>
-<div class="container">
-    <img class="img-responsive" src="{{ url_for('static', filename='logo_header.svg') }}">
-    <div id="interface" ng-controller="userController">
-        <form ng-submit="validate()">
-            <div class="form-group" ng-class="{ 'has-success' : approved, 'has-error' : (checked && !approved)}">
-                <input class="form-control" type="text"   ng-focus="checked = false" ng-model="credentials" placeholder="Identification" />
-                <span id="helpBlock" class="help-block"  ng-show="checked">
-                    {% raw %}{{ text }} {% endraw %}
-                </span>
-            </div>
-            <input class="btn btn-default"  type="submit" value="Submit"/>
+<body dir="rtl" ng-controller="userController" ng-click="reset()" ng-class="{'bg-success' : checked && approved, 'bg-danger' : checked && !approved }" >
+<nav class="navbar navbar-inverse">
+    <div class="navbar-header navbar-right">
+        <button type="button" class="disabled btn btn-danger navbar-btn" aria-label="Left Align" ng-class="{'btn-success' : 
+            hasPosition}">
+            <span class="glyphicon glyphicon-record" aria-hidden="true"></span>
+            מיקום
+        </button>
+        <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#menu" aria-expanded="false"><span class="icon-bar"></span><span class="icon-bar"></span><span class="icon-bar"></span></button>
+        <a class="navbar-brand" href="#">שבוס</a>
+    </div>
+    <div class="collapse navbar-collapse" id="menu">
+        <ul class="nav navbar-nav navbar-left">
+            <li><a href="/logout">התנתק</a></li>
+        </ul>
+    </div>
+</nav>
+<div class="container-fluid" >
+    <div id="interface" ng-hide="checked">
+        <img class="img-responsive" src="{{ url_for('static', filename='logo_header.svg') }}">
+        <form ng-submit="approve()">
+            <input class="form-control input-lg" type="text" pattern="[0-9]*" ng-model="credentials" placeholder="פרט מזהה" />
+            <input class="btn btn-success btn-block btn-lg"  type="submit" value="בדוק נוסע/ת!"/>
         </form>
+    </div>
+    <div id="result" ng-show="checked">
+        <div class="container" >
+            <h1 class="text-center"><strong>
+                    {% raw %}{{ text }}{% endraw %}        
+            </strong></h1>
+            <h3 class="text-center text-muted">לחץ על המסך או המתן {% raw %}{{ counter }}{% endraw %} שניות כדי לחזור למסך הקודם.</h3>
+        </div>
 
-        <a class="btn btn-default" href="/logout">Logout</a>
     </div>
 </div>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>

@@ -1,3 +1,31 @@
+html,body
+{
+    height:100%;
+}
+
 body {
     background-color: #93bb00;
+}
+
+.bg-danger{
+    background-color: #F2DEDE;
+}
+
+.bg-success{
+    background-color: #DFF0D8;
+}
+
+
+.img-responsive {
+    margin: 0 auto;
+    width: 40em;
+}
+
+#result{
+    color:#ffffff;
+    padding-top: 10em;
+}
+
+#result h1{
+    text-shadow: 0px 1px 1px #555;
 }
