@@ -25,7 +25,7 @@ class Member(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     creation_date = db.Column(db.DateTime, nullable=False)
     age = db.Column(db.String(255))
-    email = db.Column(db.String(254), nullable=False)
+    email = db.Column(db.String(254), nullable=False, unique=True)
     address_id = db.Column(db.Integer, db.ForeignKey("address.id"), nullable=False)
     address = db.relationship("Address", foreign_keys=[address_id])
     additional_address_id = db.Column(db.Integer, db.ForeignKey("address.id"))

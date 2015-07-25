@@ -99,7 +99,7 @@ def add_passengers(member_dict, member):
 def get_main_passenger(member_dict, member):
     # The passenger can already exist if it was a spouse of a previous passenger
     main_passenger = Passenger.query.filter(Passenger.phone_number==member_dict["phone_number"]).first()
-    if not main_passenger:
+    if not (main_passenger and main_passenger.passenger_type == "spouse"):
         main_passenger = Passenger()
     main_passenger.member = member
     main_passenger_attributes = ("last_name", "first_name", "phone_number", "id_number")
