@@ -6,6 +6,7 @@ from sqlalchemy import or_
 from sqlalchemy.orm.exc import NoResultFound, MultipleResultsFound
 import json
 import datetime
+import jotform
 
 @app.route('/')
 @login_required
@@ -43,10 +44,20 @@ def approve_ride():
         )
         db.session.add(ride)
         db.session.commit()
-        return jsonify(status="OK", data={"text" : u"הנוסע/ת בשם {0} {1} מאושר. נסיעה טובה!".format(passanger.first_name, passanger.last_name), 
+        return jsonify(status="OK", data={"text" : u"הנוסע/ת בשם {0} {1} מאושר. נסיעה טובה!".format(passanger.first_name, passanger.last_name),
                                            "approved" : True})
     except NoResultFound:
         return jsonify(status="ERROR", data={"text" : u"לא זיהינו את הנוסע/ת {0}".format(credentials), "approved" : False})
     except MultipleResultsFound:
         return jsonify(status="ERROR", data={"text" : u"תקלה: ניתן לזהות יותר מנוסע אחד לפי {0}".format(credentials), "approved" : False})
-    
+
+
+@app.route('/signup', methods=['POST'])
+def jotform_signup():
+    submission_id = request.form["submission_id"]
+    form_id = request.form["formID"]
+    last_name, first_name = request.form.getlist("input4")
+    member_dict = jotform.get_member_dict(request.form)
+    member, recommending_member_phone = import_members.process_dict(member_dict)
+    import_members.process_recommending_member_phone(member, recommending_member_phone)
+    signature_url = "uploads/shabus/%(form_id)s/%(submission_id)s/%(submission_id)s_base64_10.png" % {"form_id": form_id, "submission_id": submission_id}
