@@ -37,8 +37,8 @@ def import_from_csv():
                 member, recommending_member_phone = process_row(member_row)
                 recommending_member_phones[member] = recommending_member_phone
                 db.session.commit()
-            except:
-                logging.exception("Error while processing row %s:", row_number)
+            except Exception as e:
+                logging.error("Error while processing row %s: %s", row_number, str(e))
                 db.session.rollback()
 
     for member, recommending_member_phone in recommending_member_phones.items():
@@ -182,10 +182,15 @@ def update_family_member_details(member_dict, family_passengers, main_passenger)
         family_passenger.id_number = family_member_id_number
 
 def add_address(member_dict, member, address_name, address_prefix):
-    address = Address()
     address_attributes = ["street", "house_number", "city", "neighborhood", "zipcode", "country"]
+    address_attributes = [address_prefix + attribute for attribute in address_attributes]
+    # If all address fields are empty, don't save the address
+    if all(not has_value(member_dict[attribute]) for attribute in address_attributes):
+        return
+
+    address = Address()
     for attribute in address_attributes:
-        save_string(member_dict, address, address_prefix + attribute)
+        save_string(member_dict, address, attribute)
     db.session.add(address)
 
     setattr(member, address_name, address)
