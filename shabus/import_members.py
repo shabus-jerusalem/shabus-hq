@@ -36,16 +36,28 @@ def import_from_csv():
             try:
                 member, recommending_member_phone = process_row(member_row)
                 recommending_member_phones[member] = recommending_member_phone
+                db.session.commit()
             except:
                 logging.exception("Error while processing row %s:", row_number)
                 db.session.rollback()
-            db.session.commit()
 
     for member, recommending_member_phone in recommending_member_phones.items():
-        if recommending_member_phone == "":
+        if not has_value(recommending_member_phone):
             continue
-        recommending_member = Passenger.query.filter(Passenger.phone_number==recommending_member_phone).one().member
-        member.recommending_member = recommending_member
+        recommending_passenger = Passenger.query.filter(Passenger.phone_number==recommending_member_phone).first()
+        if not recommending_passenger:
+            logging.error(
+                "Invalid recommending member phone number '%s' for member with email '%s'" % (
+                    recommending_member_phone, member.email))
+            continue
+
+        recommending_member = recommending_passenger.member
+        if recommending_member == member:
+            logging.error("Member %s recommended himself" % member.email)
+            continue
+
+        member.recommending_member = recommending_passenger.member
+        db.session.commit()
 
     db.session.commit()
 
