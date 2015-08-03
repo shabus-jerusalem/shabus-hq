@@ -2,6 +2,10 @@ from flask import request, redirect, abort, url_for
 from flask_admin.contrib import sqla
 from flask_security import current_user
 from flask_admin import AdminIndexView, expose
+from shabus.models import User, Role, Member, Passenger, Ride, Address
+from flask_admin import Admin
+from flask_admin.contrib.sqla import ModelView
+from shabus import app, db
 
 def is_superuser():
     if not current_user.is_active() or not current_user.is_authenticated():
@@ -35,3 +39,11 @@ class ProtectedModelView(sqla.ModelView):
                 abort(403)
             else:
                 return redirect(url_for("security.login", next=request.path))
+
+admin = Admin(app, name="shabus", template_mode="bootstrap3", index_view=ProtectedAdminIndexView())
+admin.add_view(ProtectedModelView(Role, db.session))
+admin.add_view(ProtectedModelView(User, db.session))
+admin.add_view(ProtectedModelView(Member, db.session))
+admin.add_view(ProtectedModelView(Passenger, db.session))
+admin.add_view(ProtectedModelView(Ride, db.session))
+admin.add_view(ProtectedModelView(Address, db.session))
