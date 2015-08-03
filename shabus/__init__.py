@@ -4,9 +4,11 @@ from flask.ext.heroku import Heroku
 from flask.ext.sqlalchemy import SQLAlchemy
 from flask.ext.security import Security, SQLAlchemyUserDatastore
 from flask_bootstrap import Bootstrap
+from flask_admin import Admin
+from flask_admin.contrib.sqla import ModelView
 
 app = Flask(__name__)
-app.config.from_object('config')
+app.config.from_object("config")
 heroku = Heroku(app)
 db = SQLAlchemy(app)
 Bootstrap(app)
@@ -14,6 +16,11 @@ Bootstrap(app)
 from shabus.models import User, Role
 user_datastore = SQLAlchemyUserDatastore(db, User, Role)
 security = Security(app, user_datastore)
+
+from shabus.admin import ProtectedModelView, ProtectedAdminIndexView
+admin = Admin(app, name="shabus", template_mode="bootstrap3", index_view=ProtectedAdminIndexView())
+admin.add_view(ProtectedModelView(Role, db.session))
+admin.add_view(ProtectedModelView(User, db.session))
 
 import shabus.views
 

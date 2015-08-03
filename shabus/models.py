@@ -10,6 +10,9 @@ class Role(db.Model, RoleMixin):
     name = db.Column(db.String(80), unique=True)
     description = db.Column(db.String(255))
 
+    def __repr__(self):
+        return self.name
+
 class User(db.Model, UserMixin):
     __tablename__ = "user_"
     id = db.Column(db.Integer, primary_key=True)
@@ -20,7 +23,7 @@ class User(db.Model, UserMixin):
                             backref=db.backref("users", lazy="dynamic"))
 
     def __repr__(self):
-        return "<User %s>" % (self.email)
+        return self.email
 
 class Member(db.Model):
     id = db.Column(db.Integer, primary_key=True)
