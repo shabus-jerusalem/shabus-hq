@@ -6,7 +6,7 @@ from flask.ext.security import Security, SQLAlchemyUserDatastore
 from flask_bootstrap import Bootstrap
 
 app = Flask(__name__)
-app.config.from_object('config')
+app.config.from_object("config")
 heroku = Heroku(app)
 db = SQLAlchemy(app)
 Bootstrap(app)
@@ -15,6 +15,7 @@ from shabus.models import User, Role
 user_datastore = SQLAlchemyUserDatastore(db, User, Role)
 security = Security(app, user_datastore)
 
+from shabus.admin import admin
 import shabus.views
 
 if __name__ == '__main__':
