@@ -40,10 +40,13 @@ class ProtectedModelView(sqla.ModelView):
             else:
                 return redirect(url_for("security.login", next=request.path))
 
+class MemberView(ProtectedModelView):
+    column_exclude_list = ("legal_statement", )
+
 admin = Admin(app, name="shabus", template_mode="bootstrap3", index_view=ProtectedAdminIndexView())
 admin.add_view(ProtectedModelView(Role, db.session))
 admin.add_view(ProtectedModelView(User, db.session))
-admin.add_view(ProtectedModelView(Member, db.session))
+admin.add_view(MemberView(Member, db.session))
 admin.add_view(ProtectedModelView(Passenger, db.session))
 admin.add_view(ProtectedModelView(Ride, db.session))
 admin.add_view(ProtectedModelView(Address, db.session))
