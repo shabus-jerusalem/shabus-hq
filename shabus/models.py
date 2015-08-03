@@ -54,6 +54,9 @@ class Member(db.Model):
     is_founder = db.Column(db.Boolean(), nullable=False)
     comments = db.Column(db.Text())
 
+    def __repr__(self):
+        return self.email
+
 class Passenger(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     member_id = db.Column(db.Integer, db.ForeignKey("member.id"), nullable=False)
@@ -64,6 +67,10 @@ class Passenger(db.Model):
     phone_number = db.Column(db.String(255), unique=True)
     id_number = db.Column(db.String(255), unique=True)
     has_smartphone = db.Column(db.Boolean(), nullable=False)
+
+    def __repr__(self):
+        return "%s %s" % (self.first_name, self.last_name)
+
 
 class Ride(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -82,3 +89,6 @@ class Address(db.Model):
     neighborhood = db.Column(db.String(255))
     zipcode = db.Column(db.String(255))
     country = db.Column(db.String(255))
+
+    def __repr__(self):
+        return "%s %s, %s, %s" %  (self.street, self.number, self.city, self.country)
