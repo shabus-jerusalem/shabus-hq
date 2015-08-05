@@ -182,7 +182,7 @@ def update_family_member_details(member_dict, family_passengers, main_passenger)
         family_passenger.id_number = family_member_id_number
 
 def add_address(member_dict, member, address_name, address_prefix):
-    address_attributes = ["street", "house_number", "city", "neighborhood", "zipcode", "country"]
+    address_attributes = ["street", "number", "city", "neighborhood", "zipcode", "country"]
     address_attributes = [address_prefix + attribute for attribute in address_attributes]
     # If all address fields are empty, don't save the address
     if all(not has_value(member_dict[attribute]) for attribute in address_attributes):
@@ -198,13 +198,13 @@ def add_address(member_dict, member, address_name, address_prefix):
 def get_csv_columns():
     return (
         "repeat_check", "creation_date", "age", "last_name", "first_name", "phone_number",
-        "has_smartphone", "email", "street", "house_number", "city", "neighborhood", "zipcode",
-        "country", "has_additional_address", "additional_address_street", "additional_address_house_number",
+        "has_smartphone", "email", "street", "number", "city", "neighborhood", "zipcode",
+        "country", "has_additional_address", "additional_address_street", "additional_address_number",
         "additional_address_city", "additional_address_neighborhood", "additional_address_zipcode",
         "additional_address_country", "id_number", "has_family", "spouse_phone_number",
         "children_phone_numbers", "family_members_have_smartphone", "family_member_names",
         "family_member_id_numbers", "family_legal_consent", "desired_destination_street",
-        "desired_destination_house_number", "desired_destination_city",
+        "desired_destination_number", "desired_destination_city",
         "desired_destination_neighborhood", "desired_destination_zipcode",
         "desired_destination_country", "desired_ride_time", "first_of_may",
         "desired_board_time", "desired_return_time", "recommending_member_phone_number",
