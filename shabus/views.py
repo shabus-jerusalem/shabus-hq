@@ -58,6 +58,6 @@ def jotform_signup():
     form_id = request.form["formID"]
     last_name, first_name = request.form.getlist("input4")
     member_dict = jotform.get_member_dict(request.form)
-    member, recommending_member_phone = import_members.process_dict(member_dict)
+    member, recommending_member_phone = import_members.add_member(member_dict)
     import_members.process_recommending_member_phone(member, recommending_member_phone)
-    signature_url = "uploads/shabus/%(form_id)s/%(submission_id)s/%(submission_id)s_base64_10.png" % {"form_id": form_id, "submission_id": submission_id}
+    db.session.commit()

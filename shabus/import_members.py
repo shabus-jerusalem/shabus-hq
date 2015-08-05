@@ -63,7 +63,9 @@ def import_from_csv():
 
 def process_row(member_row):
     member_dict = dict(zip(get_csv_columns(), member_row))
+    return add_member(member_dict)
 
+def add_member(member_dict):
     member = Member()
     string_member_attributes = ("age", "email", "desired_ride_time", "desired_board_time",
         "desired_return_time", "legal_statement", "signature_image_url",

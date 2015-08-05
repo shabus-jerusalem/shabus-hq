@@ -1,86 +1,85 @@
 # coding=utf-8
-"""
-Form fields are:
-    q37_input37  => age (radio: "18 ומעלה" or "עוד לא 18")
-    q4_input4 => name (array: [first, last])
-    q17_input17 => cellphone
-    q5_input51 => has_smartphone (some long value in hebrew)
-    q6_input6 => mail
-    q7_input7 => address (array: [addr_line1, addr_line2, city, postal])
-    q41_input41 => has_additional_address (radio: כן / לא)
-    q40_input40 => addition_address (same as address)
-    q22_input22 => id
-"""
-#TODO: Get all fields
-JOTFORM_FIELDS = {
-    "q37_input37" : "age",
-    "q4_input4" : "name",
-    "q17_input17" : "phone",
-    "q23_input23" : "spouse_phone",
-    "q25_input25" : "children_phone", # Seperated by \n
-    "q5_input51" : "has_smartphone",
-    "q6_input6" : "mail",
-    "q7_input7" : "address",
-    "q41_input41" : "has_additional_address",
-    "q40_input40" : "addition_address",
-    "q22_input22" : "id",
-    "q48_input48" : "headstart",
-    "q49_input49" : "paypal",
-    "q42_input42" : "target_address",
-    "q27_clickTo27" : "agreement",
-    "q10_input10" : "signature",
-    "q43_input43" : "has_spouse"
+import time
+
+def get_member_dict(jotform_data):
+    member = {}
+    for jotform_name, shabus_name in JOTFORM_FIELD_NAMES_MAP.items():
+        member[shabus_name] = jotform_data[jotform_name]
+    member["creation_date"] = time.strftime("%d-%m-%Y %H:%M:%S")
+    member["signature_image_url"] = "uploads/shabus/%(form_id)s/%(submission_id)s/%(submission_id)s_base64_10.png" % {
+        "form_id": jotform_data["formID"], "submission_id": jotform_data["submission_id"]}
+
+    member["last_name"], member["first_name"] = request.form.getlist("input4[]")
+    add_address(request.form.getlist("input7[]"), "", member)
+    # add_address(request.form.getlist("input40[]"), "additional_address_", member)
+    # add_address(request.form.getlist("input42[]"), "desired_destination_", member)
+
+    OLD_ATTRIBUTES = [
+        "first_of_may",
+        "used_old_form_to_sign_up",
+        "is_manager",
+        "is_founder",
+        "has_smartphone",
+        "desired_ride_time",
+        "family_members_have_smartphone",
+        "has_additional_address",
+        "backed_on_headstart",
+        "desired_board_time",
+        "desired_return_time"]
+
+    for prefix in ["additional_address_", "desired_destination_"]:
+        OLD_ATTRIBUTES += [prefix + name for name in ADDRESS_ATTRIBUTE_NAMES]
+
+    for old_attribute in OLD_ATTRIBUTES:
+        member[old_attribute] = ""
+
+    member["comments"] = "jotform-signup"
+
+    paypal_data = request.form.getlist("input49[]")
+    paypal_field_names = (
+        "credit_card_payment_products",
+        "credit_card_payer_info",
+        "credit_card_payer_address")
+    paypal_fields = zip(paypal_field_names, paypal_data)
+    for name, value in paypal_fields.items():
+        member[name] = value
+
+    return member
+
+ADDRESS_ATTRIBUTE_NAMES = ["street", "number", "city", "neighborhood", "zipcode", "country"]
+
+def add_address(values, prefix, member):
+    address_attributes = zip(ADDRESS_ATTRIBUTE_NAMES, values)
+    for name, value in address_attributes.items():
+        member[prefix + name] = value
+
+
+JOTFORM_FIELD_NAMES_MAP = {
+    "submission_id": "jotform_submission_id",
+    "input62": "age",
+    "input43": "has_family",
+    "input17": "phone_number",
+    # "input51[]": "has_smartphone",
+    # "input18": "desired_ride_time",
+    "input6": "email",
+    "input22": "id_number",
+    "input23": "spouse_phone_number",
+    "input25": "children_phone_numbers",
+    #"input53[]": "family_members_have_smartphone",
+    "input29[]": "family_legal_consent",
+    # "input41": "has_additional_address"
+    # "input48": "backed_on_headstart",
+    # "input35": "desired_board_time",
+    # "input36": "desired_return_time",
+    "input59": "recommending_member_phone_number",
+    "input55": "family_member_names",
+    "input56": "family_member_id_numbers",
+    "clickto27": "legal_statement"
 }
 
-def rename_fields(form):
-    """
-    Renams a jotform form according to JOTFORM_FIELDS
-    :param form: the form to convert
-    :return: a converted form
-    """
-    newForm = {}
-    for key, value in form.iteritems():
-        newForm[JOTFORM_FIELDS.get(key, key)] = value
-    return newForm
-
-
-
-"""
-submission_id:YYYY
-formID:XXXX
-ip:11.22.33.11
-input62:24
-input43:כן
-input4[]:ישראלי
-input4[]:ישראל
-input17:0525949618
-input51[]:יש לי טלפון חכם (שמאפשר הורדת אפליקציה וגלישה סלולרית)
-input6:matsatl@gasc.com
-input7[]:יוחנן
-input7[]:13
-input7[]:ירושלים
-input7[]:
-input7[]:
-input7[]:Haiti
-input40[]:
-input40[]:
-input40[]:
-input40[]:
-input40[]:
-input40[]:
-input22:242350893
-input23:0525981524
-input25:
-input53[]:יש לכל בני המשפחה טלפונים חכמים (שמאפשרים הורדת אפליקציה וגלישה סלולרית)
-input29[]:כל הפרטים שלעיל שייכים אך ורק לבן/בת זוגי וילדי עד גיל 18
-input42[]:
-input42[]:
-input42[]:
-input42[]:
-input42[]:
-input42[]:Israel
-input59:2415125125
-clickto27:אני <u>תחיל</u> תעודת זהות <u>87987987</u> כתובת <u>לחילחי</u> מבקש/ת בזה להתקבל כחבר/ה ב"האגודה לתחבורה שיתופית בע"מ". אם אתקבל כחבר/ה באגודה, הנני מתחייב/ת למלא אחר הוראות תקנון האגודה. הנני מסכים/ה, כי כל הרשום בספרי האגודה יחייב אותי בקשר לכל ענין הנוגע לחובותיי כלפי האגודה או לתביעותיי מהאגודה. אני מתחייב/ת שלא לפעול בניגוד לעקרונות האגודה, בניגוד לעקרונות התנועה הקואופרטיבית, או בניגוד לאינטרסים של האגודה. אני מצהיר/ה, כי הוראות תקנון האגודה ידועות לי.
-אני מעוניין/ת להיות חבר/ה באגודה לתחבורה שיתופית בירושלים. אני תומך/ת באגודה ובמטרותיה.
-input10:data:image/png;base64,blabla=
-"""
+# safe to ignore (unused in import_members.py):
+# repeat_check
+# dynamic_support_check
+# dynamic_support_or_payment_check
+# dynamic_is_eligible_for_membership
+# ip_address
