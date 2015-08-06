@@ -183,16 +183,16 @@ def update_family_member_details(member_dict, family_passengers, main_passenger)
         family_passenger.last_name = main_passenger.last_name
         family_passenger.id_number = family_member_id_number
 
+ADDRESS_ATTRIBUTE_NAMES = ["street", "number", "city", "neighborhood", "zipcode", "country"]
 def add_address(member_dict, member, address_name, address_prefix):
-    address_attributes = ["street", "number", "city", "neighborhood", "zipcode", "country"]
-    address_attributes = [address_prefix + attribute for attribute in address_attributes]
+    address_attributes = [address_prefix + attribute for attribute in ADDRESS_ATTRIBUTE_NAMES]
     # If all address fields are empty, don't save the address
     if all(not has_value(member_dict[attribute]) for attribute in address_attributes):
         return
 
     address = Address()
-    for attribute in address_attributes:
-        save_string(member_dict, address, attribute)
+    for attribute in ADDRESS_ATTRIBUTE_NAMES:
+        setattr(address, attribute, member_dict[address_prefix + attribute])
     db.session.add(address)
 
     setattr(member, address_name, address)
