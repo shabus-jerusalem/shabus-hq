@@ -25,7 +25,16 @@ def get_member_dict(jotform_data):
         "has_additional_address",
         "backed_on_headstart",
         "desired_board_time",
-        "desired_return_time"]
+        "desired_return_time",
+        "family_member_names",
+        "family_member_id_numbers"
+        ]
+
+    OLD_ATTRIBUTES += [
+        "credit_card_payment_products",
+        "credit_card_payer_info",
+        "credit_card_payer_address"
+    ]
 
     for prefix in ["additional_address_", "desired_destination_"]:
         OLD_ATTRIBUTES += [prefix + name for name in ADDRESS_ATTRIBUTE_NAMES]
@@ -35,14 +44,14 @@ def get_member_dict(jotform_data):
 
     member["comments"] = "jotform-signup"
 
-    paypal_data = request.form.getlist("input49[]")
-    paypal_field_names = (
-        "credit_card_payment_products",
-        "credit_card_payer_info",
-        "credit_card_payer_address")
-    paypal_fields = zip(paypal_field_names, paypal_data)
-    for name, value in paypal_fields.items():
-        member[name] = value
+    # paypal_data = request.form.getlist("input49[]")
+    # paypal_field_names = (
+    #     "credit_card_payment_products",
+    #     "credit_card_payer_info",
+    #     "credit_card_payer_address")
+    # paypal_fields = zip(paypal_field_names, paypal_data)
+    # for name, value in paypal_fields.items():
+    #     member[name] = value
 
     return member
 
@@ -72,8 +81,8 @@ JOTFORM_FIELD_NAMES_MAP = {
     # "input35": "desired_board_time",
     # "input36": "desired_return_time",
     "input59": "recommending_member_phone_number",
-    "input55": "family_member_names",
-    "input56": "family_member_id_numbers",
+    #"input55": "family_member_names",
+    #"input56": "family_member_id_numbers",
     "clickto27": "legal_statement"
 }
 
