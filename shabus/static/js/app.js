@@ -1,7 +1,7 @@
 angular.module('shabusApp', [])
 
-    .controller('userController', ['$scope', '$http', '$interval', '$window',
-                function($scope, $http, $interval, $window) {
+    .controller('userController', ['$scope', '$sce', '$http', '$interval', '$window',
+                function($scope, $sce, $http, $interval, $window) {
         $scope.credentials = "";
         $scope.checked = false;
         $scope.approved = false;
@@ -51,7 +51,7 @@ angular.module('shabusApp', [])
 
                 $scope.checked = true;
                 $scope.approved = data["status"] == "OK";
-                $scope.text = data["data"]["text"]            
+                $scope.text = $sce.trustAsHtml(data["data"]["text"]);
             })
             .error(function(data, status, headers, config){
                 $scope.credentials = "";
@@ -72,7 +72,7 @@ angular.module('shabusApp', [])
         }
 
         $scope.reset = function(){
-            $scope.checked = false; 
+            $scope.checked = false;
             $scope.counter=0;
             $interval.cancel(interval);
         }

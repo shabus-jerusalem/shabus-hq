@@ -38,9 +38,10 @@
     </div>
     <div id="result" ng-show="checked">
         <div class="container" >
-            <h1 class="text-center"><strong>
-                    {% raw %}{{ text }}{% endraw %}
-            </strong></h1>
+            <h1 class="text-center">
+              <strong ng-bind-html="text">
+              </strong>
+            </h1>
             <h3 class="text-center text-muted">לחץ על המסך או המתן {% raw %}{{ counter }}{% endraw %} שניות כדי לחזור למסך הקודם.</h3>
         </div>
 

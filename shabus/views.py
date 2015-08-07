@@ -28,25 +28,29 @@ def driver():
 def approve_ride():
     # TODO: accept only unicode
     data = json.loads(request.data)
-    print repr(data["id"])
     credentials = data["id"]
     position = data["position"]
     query = models.Passenger.query.filter(or_(models.Passenger.phone_number==credentials,
                                              models.Passenger.id_number==credentials))
     try:
-        passanger = query.one()
+        passenger = query.one()
         ride = models.Ride(
-        	passenger_id = passanger.id,
+        	passenger_id = passenger.id,
         	board_time = datetime.datetime.now(),
         	recorded_by_user = core.current_user,
         	board_location = json.dumps(position)
         )
         db.session.add(ride)
         db.session.commit()
-        return jsonify(status="OK", data={"text" : u"הנוסע/ת בשם {0} {1} מאושר. נסיעה טובה!".format(passanger.first_name, passanger.last_name), 
-                                           "approved" : True})
+        if passenger.first_name is not None and passenger.last_name is not None:
+            text = u"הנוסע/ת {0} {1} מאושר/ת.<br />".format(passenger.first_name, passenger.last_name)
+        else:
+            text = u"הנוסע/ת %s מאושר/ת.<br />" % credentials
+        if passenger.passenger_type != "member":
+            text += u"נסיעה נרשמה לחבר/ה %s.<br />" % passenger.member.email
+        text += u"נסיעה טובה!"
+        return jsonify(status="OK", data={"text" : text, "approved" : True})
     except NoResultFound:
         return jsonify(status="ERROR", data={"text" : u"לא זיהינו את הנוסע/ת {0}".format(credentials), "approved" : False})
     except MultipleResultsFound:
         return jsonify(status="ERROR", data={"text" : u"תקלה: ניתן לזהות יותר מנוסע אחד לפי {0}".format(credentials), "approved" : False})
-    
