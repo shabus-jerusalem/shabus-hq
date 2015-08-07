@@ -14,7 +14,7 @@
 <body dir="rtl" ng-controller="userController" ng-click="reset()" ng-class="{'bg-success' : checked && approved, 'bg-danger' : checked && !approved }" >
 <nav class="navbar navbar-inverse">
     <div class="navbar-header navbar-right">
-        <button type="button" class="disabled btn btn-danger navbar-btn" aria-label="Left Align" ng-class="{'btn-success' : 
+        <button type="button" class="disabled btn btn-danger navbar-btn" aria-label="Left Align" ng-class="{'btn-success' :
             hasPosition}">
             <span class="glyphicon glyphicon-record" aria-hidden="true"></span>
             מיקום
@@ -32,14 +32,14 @@
     <div id="interface" ng-hide="checked">
         <img class="img-responsive" src="{{ url_for('static', filename='logo_header.svg') }}">
         <form ng-submit="approve()">
-            <input class="form-control input-lg" type="text" pattern="[0-9]*" ng-model="credentials" placeholder="פרט מזהה" />
+            <input class="form-control input-lg" type="text" pattern="[0-9]+" minlength="9" required ng-model="credentials" placeholder="מספר תעודת זהות (9 ספרות) או טלפון נייד (ללא מקפים)" />
             <input class="btn btn-success btn-block btn-lg"  type="submit" value="בדוק נוסע/ת!"/>
         </form>
     </div>
     <div id="result" ng-show="checked">
         <div class="container" >
             <h1 class="text-center"><strong>
-                    {% raw %}{{ text }}{% endraw %}        
+                    {% raw %}{{ text }}{% endraw %}
             </strong></h1>
             <h3 class="text-center text-muted">לחץ על המסך או המתן {% raw %}{{ counter }}{% endraw %} שניות כדי לחזור למסך הקודם.</h3>
         </div>
