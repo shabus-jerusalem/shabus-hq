@@ -54,9 +54,6 @@ def approve_ride():
 
 @app.route('/signup', methods=['POST'])
 def jotform_signup():
-    submission_id = request.form["submission_id"]
-    form_id = request.form["formID"]
-    last_name, first_name = request.form.getlist("input4")
     member_dict = jotform.get_member_dict(request.form)
     member, recommending_member_phone = import_members.add_member(member_dict)
     import_members.process_recommending_member_phone(member, recommending_member_phone)
