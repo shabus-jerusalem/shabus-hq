@@ -93,7 +93,7 @@ JOTFORM_FIELD_NAMES_MAP = {
     "q23_input23": "spouse_phone_number",
     "q25_input25": "children_phone_numbers",
     #"input53[]": "family_members_have_smartphone",
-    "q29_input29[]": "family_legal_consent",
+    #"q29_input29[]": "family_legal_consent",
     # "input41": "has_additional_address"
     # "input48": "backed_on_headstart",
     # "input35": "desired_board_time",
