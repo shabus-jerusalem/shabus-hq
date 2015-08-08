@@ -16,12 +16,18 @@ def validate_signup(jotform_request):
     url = JOTFORM_SUBMISSION_API_URL % submission_id
     response = requests.get(url)
     if response.status_code == requests.codes.ok:
-        return True
+        json = response.json()
+        form_id = json["content"]["form_id"]
+        if form_id == os.environ["JOTFORM_FORM_ID"]:
+            return True
+        else:
+            logging.error("Jotform submission validation failed. Got wrong form id: %s", form_id)
+            return False
     else:
         logging.error(
             "Jotform submission validation failed.\n"
-            "Submission id: %s.\nStatus code: %s.\nResponse text: %s" %
-            (submission_id, response.status_code, response.text))
+            "Submission id: %s.\nStatus code: %s.\nResponse text: %s",
+            submission_id, response.status_code, response.text)
         return False
 
 def get_member_dict(jotform_request):
