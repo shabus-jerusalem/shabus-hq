@@ -194,21 +194,22 @@ def add_address(member_dict, member, address_name, address_prefix):
 
 def process_recommending_member_phone(member, recommending_member_phone):
     if not has_value(recommending_member_phone):
-        return
+        return True
     recommending_passenger = Passenger.query.filter(Passenger.phone_number==recommending_member_phone).first()
     if not recommending_passenger:
         logging.error(
             "Invalid recommending member phone number '%s' for member with email '%s'" % (
                 recommending_member_phone, member.email))
-        return
+        return False
 
     recommending_member = recommending_passenger.member
     if recommending_member == member:
         logging.error("Member %s recommended himself" % member.email)
-        return
+        return False
 
     member.recommending_member = recommending_passenger.member
     db.session.commit()
+    return True
 
 def get_csv_columns():
     return (

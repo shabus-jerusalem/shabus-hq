@@ -1,13 +1,17 @@
 # -*- coding: utf8 -*-
 from flask import render_template, jsonify, request
-from shabus import app, models, db
+from shabus import app, models, db, mail
 from flask.ext.security import login_required, core
+from flask_mail import Message
 from sqlalchemy import or_
 from sqlalchemy.orm.exc import NoResultFound, MultipleResultsFound
 import json
 import datetime
 import jotform
 import import_members
+import logging
+import os
+import traceback
 
 @app.route('/')
 @login_required
@@ -55,7 +59,33 @@ def approve_ride():
 
 @app.route('/signup', methods=['POST'])
 def jotform_signup():
-    member_dict = jotform.get_member_dict(request.form)
-    member, recommending_member_phone = import_members.add_member(member_dict)
-    import_members.process_recommending_member_phone(member, recommending_member_phone)
-    db.session.commit()
+    # Security: make sure the user actually paid.
+    if not jotform.validate_signup(request.form):
+        return ""
+
+    logging.info("Got JotForm submission: %s" % request.form["submissionID"])
+
+    try:
+        member_dict = jotform.get_member_dict(request.form)
+        member, recommending_member_phone = import_members.add_member(member_dict)
+        recommending_member_success = import_members.process_recommending_member_phone(
+            member, recommending_member_phone)
+        db.session.commit()
+        if not recommending_member_success:
+            send_error_email("Invalid recommending member")
+    except:
+        db.session.rollback()
+        logging.exception("Error while processing submission:")
+        send_error_email("Exception while processing submission:\n" + traceback.format_exc())
+
+    logging.info("Submission processing finished")
+
+    return ""
+
+def send_error_email(body):
+    msg = Message(
+        body=body,
+        subject="Shabus JotForm Webhook Error",
+        sender=("Shabus JotForm Webhook", "webhook@shabus.co.il"),
+        recipients=os.environ["WEBHOOK_ERROR_RECIPIENTS"].split(";"))
+    mail.send(msg)

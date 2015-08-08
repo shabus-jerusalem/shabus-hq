@@ -1,6 +1,28 @@
 # coding=utf-8
 import json
 import time
+import requests
+import logging
+import os
+
+JOTFORM_SUBMISSION_API_URL = "https://api.jotform.com/submission/%%s?apiKey=%s" % os.environ["JOTFORM_API_KEY"]
+
+def validate_signup(jotform_request):
+    """
+    Make sure we're not getting phony POST data to the webhook by validating that the form
+    submission actually exists on JotForm, meaning the user has actually paid the membership fee.
+    """
+    submission_id = jotform_request["submissionID"]
+    url = JOTFORM_SUBMISSION_API_URL % submission_id
+    response = requests.get(url)
+    if response.status_code == requests.codes.ok:
+        return True
+    else:
+        logging.error(
+            "Jotform submission validation failed.\n"
+            "Submission id: %s.\nStatus code: %s.\nResponse text: %s" %
+            (submission_id, response.status_code, response.text))
+        return False
 
 def get_member_dict(jotform_request):
     member = {}
