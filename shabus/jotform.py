@@ -16,8 +16,7 @@ def validate_signup(jotform_request):
     url = JOTFORM_SUBMISSION_API_URL % submission_id
     response = requests.get(url)
     if response.status_code == requests.codes.ok:
-        json = response.json()
-        form_id = json["content"]["form_id"]
+        form_id = response.json()["content"]["form_id"]
         if form_id == os.environ["JOTFORM_FORM_ID"]:
             return True
         else:
