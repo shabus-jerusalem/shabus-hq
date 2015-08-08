@@ -9,7 +9,7 @@ sys.path.append(localpath(".."))
 from shabus.models import Member, Passenger, Address
 from shabus import db
 
-MEMBERS_CSV_FILENAME = localpath("shabus_members_2015-07-24_15-45-00.csv")
+MEMBERS_CSV_FILENAME = localpath("shabus_members_2015-07-30_01-27-00.csv")
 
 def main():
     logging.basicConfig(
@@ -31,39 +31,34 @@ def import_from_csv():
         # Skip header row
         next(reader)
         for row_number, member_row in enumerate(reader):
+            logging.info("Processing row: %s", row_number)
             if member_row[0] == u"הסתר":
+                logging.info("Row is hidden - skipping")
                 continue
             try:
                 member, recommending_member_phone = process_row(member_row)
                 recommending_member_phones[member] = recommending_member_phone
                 db.session.commit()
             except Exception as e:
-                logging.error("Error while processing row %s: %s", row_number, str(e))
+                message = str(e)
+                if "duplicate key value" in message:
+                    detail = "DETAIL:  "
+                    duplicate_value = message[message.find(detail) + len(detail):]
+                    logging.error("Failed to process row. Duplicate value found: %s", duplicate_value)
+                else:
+                    logging.exception("Error while processing row %s: ", row_number)
                 db.session.rollback()
 
     for member, recommending_member_phone in recommending_member_phones.items():
-        if not has_value(recommending_member_phone):
-            continue
-        recommending_passenger = Passenger.query.filter(Passenger.phone_number==recommending_member_phone).first()
-        if not recommending_passenger:
-            logging.error(
-                "Invalid recommending member phone number '%s' for member with email '%s'" % (
-                    recommending_member_phone, member.email))
-            continue
-
-        recommending_member = recommending_passenger.member
-        if recommending_member == member:
-            logging.error("Member %s recommended himself" % member.email)
-            continue
-
-        member.recommending_member = recommending_passenger.member
-        db.session.commit()
+        process_recommending_member_phone(member, recommending_member_phone)
 
     db.session.commit()
 
 def process_row(member_row):
     member_dict = dict(zip(get_csv_columns(), member_row))
+    return add_member(member_dict)
 
+def add_member(member_dict):
     member = Member()
     string_member_attributes = ("age", "email", "desired_ride_time", "desired_board_time",
         "desired_return_time", "legal_statement", "signature_image_url",
@@ -102,6 +97,8 @@ def get_main_passenger(member_dict, member):
     if not (main_passenger and main_passenger.passenger_type == "spouse"):
         main_passenger = Passenger()
     main_passenger.member = member
+    member_dict["phone_number"] = clean_phone_number(member_dict["phone_number"])
+    member_dict["id_number"] = clean_id_number(member_dict["id_number"])
     main_passenger_attributes = ("last_name", "first_name", "phone_number", "id_number")
     for passenger_attribute in main_passenger_attributes:
         save_string(member_dict, main_passenger, passenger_attribute)
@@ -154,7 +151,7 @@ def get_spouse_passenger(member_dict, member):
     spouse_passenger = Passenger()
     spouse_passenger.member = member
     spouse_passenger.passenger_type = "spouse"
-    spouse_passenger.phone_number = member_dict["spouse_phone_number"]
+    spouse_passenger.phone_number = clean_phone_number(member_dict["spouse_phone_number"])
     return spouse_passenger
 
 def get_child_passengers(member_dict, member):
@@ -163,7 +160,7 @@ def get_child_passengers(member_dict, member):
         child_passenger = Passenger()
         child_passenger.member = member
         child_passenger.passenger_type = "child"
-        child_passenger.phone_number = child_phone_number
+        child_passenger.phone_number = clean_phone_number(child_phone_number)
         yield child_passenger
 
 def update_family_member_details(member_dict, family_passengers, main_passenger):
@@ -179,21 +176,40 @@ def update_family_member_details(member_dict, family_passengers, main_passenger)
         zip(family_passengers, family_member_names, family_member_id_numbers):
         family_passenger.first_name = family_member_name
         family_passenger.last_name = main_passenger.last_name
-        family_passenger.id_number = family_member_id_number
+        family_passenger.id_number = clean_id_number(family_member_id_number)
 
+ADDRESS_ATTRIBUTE_NAMES = ["street", "number", "city", "neighborhood", "zipcode", "country"]
 def add_address(member_dict, member, address_name, address_prefix):
-    address_attributes = ["street", "number", "city", "neighborhood", "zipcode", "country"]
-    address_attributes = [address_prefix + attribute for attribute in address_attributes]
+    address_attributes = [address_prefix + attribute for attribute in ADDRESS_ATTRIBUTE_NAMES]
     # If all address fields are empty, don't save the address
     if all(not has_value(member_dict[attribute]) for attribute in address_attributes):
         return
 
     address = Address()
-    for attribute in address_attributes:
-        save_string(member_dict, address, attribute)
+    for attribute in ADDRESS_ATTRIBUTE_NAMES:
+        setattr(address, attribute, member_dict[address_prefix + attribute])
     db.session.add(address)
 
     setattr(member, address_name, address)
+
+def process_recommending_member_phone(member, recommending_member_phone):
+    if not has_value(recommending_member_phone):
+        return True
+    recommending_passenger = Passenger.query.filter(Passenger.phone_number==recommending_member_phone).first()
+    if not recommending_passenger:
+        logging.error(
+            "Invalid recommending member phone number '%s' for member with email '%s'" % (
+                recommending_member_phone, member.email))
+        return False
+
+    recommending_member = recommending_passenger.member
+    if recommending_member == member:
+        logging.error("Member %s recommended himself" % member.email)
+        return False
+
+    member.recommending_member = recommending_passenger.member
+    db.session.commit()
+    return True
 
 def get_csv_columns():
     return (
@@ -213,6 +229,31 @@ def get_csv_columns():
         "ip_address", "jotform_submission_id", "used_old_form_to_sign_up", "dynamic_support_check",
         "dynamic_support_or_payment_check", "dynamic_is_eligible_for_membership", "is_manager",
         "is_founder", "comments")
+
+def clean_id_number(id_number):
+    if id_number == "":
+        logging.error("Found empty id number")
+        return ""
+    if not id_number.isdigit() or len(id_number) > 9:
+        logging.error("Found invalid id number: %s", id_number)
+        return id_number
+    return id_number.zfill(9)
+
+def clean_phone_number(phone_number):
+    if phone_number == "":
+        logging.error("Found empty phone number")
+        return ""
+    stripped_number = phone_number.replace("-", "")
+    if stripped_number == "":
+        logging.error("Found invalid phone number: %s", phone_number)
+        return ""
+
+    if not stripped_number.isdigit() or len(stripped_number) != 10 \
+        or not stripped_number.startswith("05") or stripped_number == "":
+        logging.error("Found invalid phone number: %s", phone_number)
+        return phone_number
+
+    return stripped_number
 
 def save_value(attribute_dict, entity, attribute_name, parsing_function):
     parsed_value = parsing_function(attribute_dict[attribute_name])
