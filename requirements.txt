@@ -7,3 +7,4 @@ psycopg2
 Flask-Security
 Flask-Bootstrap
 Flask-Admin
+Flask-Mail
