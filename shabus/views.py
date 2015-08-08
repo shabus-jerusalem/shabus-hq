@@ -7,6 +7,7 @@ from sqlalchemy.orm.exc import NoResultFound, MultipleResultsFound
 import json
 import datetime
 import jotform
+import import_members
 
 @app.route('/')
 @login_required

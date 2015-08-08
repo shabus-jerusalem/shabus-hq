@@ -50,22 +50,7 @@ def import_from_csv():
                 db.session.rollback()
 
     for member, recommending_member_phone in recommending_member_phones.items():
-        if not has_value(recommending_member_phone):
-            continue
-        recommending_passenger = Passenger.query.filter(Passenger.phone_number==recommending_member_phone).first()
-        if not recommending_passenger:
-            logging.error(
-                "Invalid recommending member phone number '%s' for member with email '%s'" % (
-                    recommending_member_phone, member.email))
-            continue
-
-        recommending_member = recommending_passenger.member
-        if recommending_member == member:
-            logging.error("Member %s recommended himself" % member.email)
-            continue
-
-        member.recommending_member = recommending_passenger.member
-        db.session.commit()
+        process_recommending_member_phone(member, recommending_member_phone)
 
     db.session.commit()
 
@@ -206,6 +191,24 @@ def add_address(member_dict, member, address_name, address_prefix):
     db.session.add(address)
 
     setattr(member, address_name, address)
+
+def process_recommending_member_phone(member, recommending_member_phone):
+    if not has_value(recommending_member_phone):
+        return
+    recommending_passenger = Passenger.query.filter(Passenger.phone_number==recommending_member_phone).first()
+    if not recommending_passenger:
+        logging.error(
+            "Invalid recommending member phone number '%s' for member with email '%s'" % (
+                recommending_member_phone, member.email))
+        return
+
+    recommending_member = recommending_passenger.member
+    if recommending_member == member:
+        logging.error("Member %s recommended himself" % member.email)
+        return
+
+    member.recommending_member = recommending_passenger.member
+    db.session.commit()
 
 def get_csv_columns():
     return (
