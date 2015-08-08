@@ -32,7 +32,8 @@ def validate_signup(jotform_request):
 def get_member_dict(jotform_request):
     member = {}
     member["jotform_submission_id"] = jotform_request["submissionID"]
-    jotform_data = json.loads(jotform_request["rawRequest"])
+    raw_request = jotform_request["rawRequest"].replace("\\r\\n", "\\n")
+    jotform_data = json.loads(raw_request)
 
     for jotform_name, shabus_name in JOTFORM_FIELD_NAMES_MAP.items():
         member[shabus_name] = jotform_data[jotform_name]
