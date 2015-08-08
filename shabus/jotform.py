@@ -6,6 +6,7 @@ import logging
 import os
 
 JOTFORM_SUBMISSION_API_URL = "https://api.jotform.com/submission/%%s?apiKey=%s" % os.environ["JOTFORM_API_KEY"]
+JOTFORM_SUBMISSION_LINK = "https://www.jotform.com/submission/%s"
 
 def validate_signup(jotform_request):
     """

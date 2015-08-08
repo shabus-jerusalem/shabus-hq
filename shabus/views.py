@@ -63,7 +63,8 @@ def jotform_signup():
     if not jotform.validate_signup(request.form):
         return ""
 
-    logging.info("Got JotForm submission: %s" % request.form["submissionID"])
+    submission_id = request.form["submissionID"]
+    logging.info("Got JotForm submission: %s" % submission_id)
 
     try:
         member_dict = jotform.get_member_dict(request.form)
@@ -72,17 +73,20 @@ def jotform_signup():
             member, recommending_member_phone)
         db.session.commit()
         if not recommending_member_success:
-            send_error_email("Invalid recommending member")
+            send_error_email("Invalid recommending member.", submission_id)
     except:
         db.session.rollback()
         logging.exception("Error while processing submission:")
-        send_error_email("Exception while processing submission:\n" + traceback.format_exc())
+        send_error_email("Exception while processing submission:\n" + traceback.format_exc(), submission_id)
 
     logging.info("Submission processing finished")
 
     return ""
 
-def send_error_email(body):
+def send_error_email(error, submission_id):
+    submission_link = jotform.JOTFORM_SUBMISSION_LINK % submission_id
+    body = "Error while processing jotform submission with id %s.\nSubmittion details: %s\n\n%s" % (
+        submission_id, submission_link, error)
     msg = Message(
         body=body,
         subject="Shabus JotForm Webhook Error",
