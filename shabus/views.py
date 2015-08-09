@@ -95,6 +95,6 @@ def send_error_email(error, submission_id):
     msg = Message(
         body=body,
         subject="Shabus JotForm Webhook Error",
-        sender=("Shabus JotForm Webhook", "webhook@shabus.co.il"),
+        sender=os.environ["MAIL_SENDER"],
         recipients=os.environ["WEBHOOK_ERROR_RECIPIENTS"].split(";"))
     mail.send(msg)
