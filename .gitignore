@@ -38,3 +38,4 @@ shabus/hopon.py
 
 *.swp
 .env
+production.env
