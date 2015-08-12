@@ -32,7 +32,7 @@
     <div id="interface" ng-hide="checked">
         <img class="img-responsive" src="{{ url_for('static', filename='logo_header.svg') }}">
         <form ng-submit="approve()">
-            <input class="form-control input-lg" type="text" pattern="[0-9]+" minlength="9" required ng-model="credentials" placeholder="מספר תעודת זהות (9 ספרות) או טלפון נייד (ללא מקפים)" />
+            <input class="form-control input-lg" type="tel" pattern="[0-9]{9,}" minlength="9" required ng-model="credentials" placeholder="מספר תעודת זהות (9 ספרות) או טלפון נייד (ללא מקפים)" />
             <input class="btn btn-success btn-block btn-lg"  type="submit" value="בדוק נוסע/ת!"/>
         </form>
     </div>
@@ -44,7 +44,8 @@
             </h1>
             <h3 class="text-center text-muted">לחץ על המסך או המתן {% raw %}{{ counter }}{% endraw %} שניות כדי לחזור למסך הקודם.</h3>
         </div>
-
+        <audio id="success" preload="auto" src="{{ url_for('static', filename='sound/success.mp3') }}"></audio>
+        <audio id="fail" preload="auto" src="{{ url_for('static', filename='sound/fail.mp3') }}"></audio>
     </div>
 </div>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>

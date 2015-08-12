@@ -41,23 +41,36 @@ angular.module('shabusApp', [])
         },
         { "maximumAge" : 30000, "timeout" : 1000 });
 
+        $scope.showResult = function(approved, text){
+            $scope.credentials = "";
+            $scope.counter = 5;
+            interval = $interval($scope.countdown, 1000);
+
+            $scope.checked = true;
+            $scope.approved = approved;
+            $scope.text = $sce.trustAsHtml(text);
+            if (approved){
+                document.getElementById('success').play()
+            } else {
+                document.getElementById('fail').play()
+            }
+        }
+
         $scope.approve = function() {
             console.log(position);
             $http.post('/driver/approve', {"id" : $scope.credentials, "position" : position})
             .success(function(data, status, headers, config){
-                $scope.credentials = "";
-                $scope.counter = 5;
-                interval = $interval($scope.countdown, 1000);
-
-                $scope.checked = true;
-                $scope.approved = data["status"] == "OK";
-                $scope.text = $sce.trustAsHtml(data["data"]["text"]);
+                $scope.showResult(data["status"] == "OK", data["data"]["text"]);
             })
             .error(function(data, status, headers, config){
-                $scope.credentials = "";
                 // Logout in case user isn't logged in
                 if (status >= 400 && status < 500){
+                    $scope.credentials = "";
                     $window.location.href = '/login';
+                }
+                // In case of other error:
+                else {
+                    $scope.showResult(false, "מצטערים, ארעה שגיאה באימות");
                 }
             });
         };
