@@ -34,8 +34,6 @@ def driver():
 def approve_ride():
     # TODO: accept only unicode
     data = json.loads(request.data)
-
-    print data
     credentials = data["id"]
     position = data["position"]
     query = models.Passenger.query.filter(or_(models.Passenger.phone_number==credentials,
@@ -43,18 +41,29 @@ def approve_ride():
     try:
         passenger = query.one()
     except NoResultFound:
-        return jsonify(status="ERROR", data={"text" : u"לא זיהינו את הנוסע/ת {0}".format(credentials), "approved" : False})
+        return jsonify(
+            status="ERROR",
+            data={
+                "text": u"לא זיהינו את הנוסע/ת {0}".format(credentials),
+                "approved": False})
     except MultipleResultsFound:
-        return jsonify(status="ERROR", data={"text" : u"תקלה: ניתן לזהות יותר מנוסע אחד לפי {0}".format(credentials), "approved" : False})
+        return jsonify(
+            status="ERROR",
+            data={
+                "text": u"תקלה: ניתן לזהות יותר מנוסע אחד לפי {0}".format(credentials),
+                "approved": False})
 
-    query = models.Ride.query.filter(models.Ride.passenger_id == passenger.id).order_by(desc(models.Ride.board_time))
-    try:
-        last_ride = query.first()
-    except NoResultFound:
-        last_ride = None
+    query = models.Ride.query.filter(models.Ride.passenger_id == passenger.id).order_by(
+        desc(models.Ride.board_time))
+    last_ride = query.first()
 
     if last_ride and datetime.datetime.now() - last_ride.board_time < datetime.timedelta(minutes=5):
-        return jsonify(status="OK", data={"text" : u"הנוסע/ת %s זוה/תה לאחרונה.<br />" % credentials, "approved" : True})
+        return jsonify(
+            status="OK",
+            data={
+                "text": (u"הנוסע/ת %s מאושר.<br />הנסיעה לא נרשמה " +
+                    u"כיוון שלנוסע/ת כבר נרשמה נסיעה בחמש הדקות האחרונות.") % credentials,
+                "approved": True})
 
     ride = models.Ride(
         passenger_id = passenger.id,
@@ -94,7 +103,9 @@ def jotform_signup():
     except:
         db.session.rollback()
         logging.exception("Error while processing submission:")
-        send_error_email("Exception while processing submission:\n" + traceback.format_exc(), submission_id)
+        send_error_email(
+            "Exception while processing submission:\n" + traceback.format_exc(),
+            submission_id)
 
     logging.info("Submission processing finished")
 
