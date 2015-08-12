@@ -37,7 +37,7 @@ def get_member_dict(jotform_request):
     jotform_data = json.loads(raw_request)
 
     for jotform_name, shabus_name in JOTFORM_FIELD_NAMES_MAP.items():
-        member[shabus_name] = jotform_data[jotform_name]
+        member[shabus_name] = jotform_data.get(jotform_name, "")
 
     member["creation_date"] = time.strftime("%d-%m-%Y %H:%M:%S")
     member["signature_image_url"] = "uploads/shabus/%(form_id)s/%(submission_id)s/%(submission_id)s_base64_10.png" % {
