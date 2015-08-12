@@ -33,7 +33,7 @@
         <img class="img-responsive" src="{{ url_for('static', filename='logo_header.svg') }}">
         <form ng-submit="approve()">
             <input class="form-control input-lg" type="tel" pattern="[0-9]{9,}" minlength="9" required ng-model="credentials" placeholder="מספר תעודת זהות (9 ספרות) או טלפון נייד (ללא מקפים)" />
-            <input class="btn btn-success btn-block btn-lg"  type="submit" value="בדוק נוסע/ת!"/>
+            <input class="btn btn-success btn-block btn-lg"  type="submit" value="רישום נסיעה"/>
         </form>
     </div>
     <div id="result" ng-show="checked">
