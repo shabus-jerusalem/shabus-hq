@@ -8,6 +8,7 @@ angular.module('shabusApp', [])
         $scope.text = "";
         $scope.counter = 0;
         $scope.hasPosition = false;
+        $scope.waiting = false;
 
         var position = {
             "accuracy" : null,
@@ -57,12 +58,15 @@ angular.module('shabusApp', [])
         }
 
         $scope.approve = function() {
+            $scope.waiting = true;
             console.log(position);
             $http.post('/driver/approve', {"id" : $scope.credentials, "position" : position})
             .success(function(data, status, headers, config){
+                $scope.waiting = false;
                 $scope.showResult(data["status"] == "OK", data["data"]["text"]);
             })
             .error(function(data, status, headers, config){
+                $scope.waiting = false;
                 // Logout in case user isn't logged in
                 if (status >= 400 && status < 500){
                     $scope.credentials = "";
@@ -70,7 +74,8 @@ angular.module('shabusApp', [])
                 }
                 // In case of other error:
                 else {
-                    $scope.showResult(false, "מצטערים, ארעה שגיאה באימות");
+                    //$scope.approve(); //Maybe we should try again
+                    $scope.showResult(false, "מצטערים, ארעה שגיאה באימות. אנא נסו שנית.");
                 }
             });
         };
