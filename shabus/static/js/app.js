@@ -17,6 +17,7 @@ angular.module('shabusApp', [])
             "speed" : null
         };
         var interval = null;
+        var retry = 5;
 
 
         $window.navigator.geolocation.watchPosition(function(current_position){
@@ -74,8 +75,13 @@ angular.module('shabusApp', [])
                 }
                 // In case of other error:
                 else {
-                    //$scope.approve(); //Maybe we should try again
-                    $scope.showResult(false, "מצטערים, ארעה שגיאה באימות. אנא נסו שנית.");
+                    retry--;
+                    if (retry > 0){
+                        $scope.approve();
+                    } else {
+                        $scope.showResult(false, "מצטערים, ארעה שגיאה באימות. אנא נסו שנית.");
+                        retry = 5;
+                    }
                 }
             });
         };
