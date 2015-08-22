@@ -9,3 +9,4 @@ Flask-Bootstrap
 Flask-Admin
 Flask-Mail
 requests
+Flask-Script
