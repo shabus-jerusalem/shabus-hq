@@ -99,7 +99,8 @@ def jotform_signup():
             member, recommending_member_phone)
         db.session.commit()
         if not recommending_member_success:
-            send_error_email("Invalid recommending member.", submission_id)
+            send_error_email("Submission processed successfully and added to DB. " +
+                "Recommending member cannot be found.", submission_id)
     except:
         db.session.rollback()
         logging.exception("Error while processing submission:")
