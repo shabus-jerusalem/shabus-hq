@@ -41,7 +41,7 @@ class Member(db.Model):
     desired_board_time = db.Column(db.String(255))
     desired_return_time = db.Column(db.String(255))
     recommending_member_id = db.Column(db.Integer, db.ForeignKey("member.id"))
-    recommending_member = db.relationship("Member", remote_side=[id])
+    recommending_member = db.relationship("Member", remote_side=[id], backref="recommended_members")
     legal_statement = db.Column(db.Text())
     signature_image_url = db.Column(db.String(255))
     backed_on_headstart = db.Column(db.Boolean(), nullable=False)
