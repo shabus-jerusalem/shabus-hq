@@ -10,3 +10,4 @@ Flask-Admin
 Flask-Mail
 requests
 Flask-Script
+Flask-WTF

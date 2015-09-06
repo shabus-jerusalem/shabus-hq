@@ -12,6 +12,10 @@ import import_members
 import logging
 import os
 import traceback
+from flask.ext.wtf import Form
+from wtforms import TextField, IntegerField, SubmitField, BooleanField
+from wtforms.validators import DataRequired, NumberRange, Regexp, Email
+
 
 @app.route('/')
 @login_required
@@ -122,3 +126,23 @@ def send_error_email(error, submission_id):
         sender=os.environ["MAIL_SENDER"],
         recipients=os.environ["WEBHOOK_ERROR_RECIPIENTS"].split(";"))
     mail.send(msg)
+
+
+class RegistrationForm(Form):
+    age = IntegerField('Age', validators=[DataRequired(), NumberRange(18, 200)])
+    has_family = BooleanField('I have a spouse or children below 18')
+    first_name = TextField('First name', [DataRequired()])
+    last_name = TextField('Last name', [DataRequired()])
+    phone_number = TextField('Phone number', [DataRequired(), Regexp("05[0-9][0-9]{7}")])
+    email = TextField('Email', [DataRequired(), Email()])
+
+    submit_button = SubmitField('Submit Form')
+
+
+
+@app.route('/register', methods=['GET', 'POST'])
+def register():
+    form = RegistrationForm()
+    if form.validate_on_submit():
+        return "yosi tosi"
+    return render_template("register.html", form=form)
